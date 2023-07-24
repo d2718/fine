@@ -50,6 +50,15 @@ fn check_match(opts: &Opts, ent: &DirEntry) -> Option<bool> {
 /// Walk the directory tree starting from `opts.base`, checking
 /// for and printing paths with matching filenames.
 fn walk_and_check(opts: &Opts) -> Result<(), Box<dyn Error>> {
+    let meta = std::fs::metadata(&opts.base).map_err(|e| format!(
+        "unable to read from \"{}\": {}", &opts.base.display(), &e
+    ))?;
+    if !meta.is_dir() {
+        return Err(format!(
+            "\"{}\" is not a directory", &opts.base.display()
+        ).into());
+    }
+    
     for res in WalkDir::new(&opts.base).follow_links(false) {
         let ent = match (res, opts.errors) {
             (Ok(ent), _) => ent,

@@ -1,7 +1,8 @@
 # fine
-A friendlier version of find.
 
 ```text
+A more forgiving version of find; it works just fine
+
 Usage: fine [OPTIONS] [PATTERN]...
 
 Arguments:
@@ -10,7 +11,9 @@ Arguments:
 Options:
   -d, --dir <BASE>  Base directory in which to search [default: .]
   -r, --regex       Use regex (instead of glob) matching
-  -a, --absolute    Print absolute paths [default: relative to BASE]
+  -a, --absolute    Print absolute paths. [default: relative to BASE]
+  -f, --full        Match any part of the path, not just the filename
+  -e, --errors      Show access errors (default is to ignore them)
   -h, --help        Print help
   -V, --version     Print version
 ```

@@ -7,6 +7,7 @@ use clap::Parser;
 use globset::Glob;
 use regex::bytes::RegexSet;
 
+/// A more forgiving version of find; it works just fine.
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct OptArgs {
