@@ -19,9 +19,15 @@ struct OptArgs {
     /// Use regex (instead of glob) matching.
     #[arg(short, long, default_value_t = false)]
     regex: bool,
-    /// Print absolute paths [default: relative to BASE]
+    /// Print absolute paths. [default: relative to BASE]
     #[arg(short, long)]
     absolute: bool,
+    /// Match any part of the path, not just the filename.
+    #[arg(short, long)]
+    full: bool,
+    /// Show access errors (default is to ignore them).
+    #[arg(short, long)]
+    errors: bool,
 }
 
 /// Options derived from [`OptArgs`] to be usable to the rest of
@@ -34,6 +40,12 @@ pub struct Opts {
     pub base: PathBuf,
     /// Whether to display aboslute (or relative) path names.
     pub absolute: bool,
+    /// Whether to match on _any_ part of the path (not just
+    /// the final element).
+    pub full: bool,
+    /// Show errors (default is to ignore them because they are usually
+    /// just permissions errors).
+    pub errors: bool,
 }
 
 impl Opts {
@@ -63,6 +75,8 @@ impl Opts {
         opts.patterns = patterns;
         opts.base = PathBuf::from(oa.base);
         opts.absolute = oa.absolute;
+        opts.full = oa.full;
+        opts.errors = oa.errors;
 
         Ok(opts)
     }

@@ -73,10 +73,23 @@ target/debug/.fingerprint/clap_lex-a87e359c0a25297d
 target/debug/.fingerprint/clap_builder-8a1806fd13db2c47
 ```
 
+Match your pattern agains the entire path (instead of just the final
+element) with `-p`:
+
+```rust
+dan@lauDANum:~/dev/fine$ fine -d ~/.config *helix*
+/home/dan/.config/helix
+dan@lauDANum:~/dev/fine$ fine -d ~/.config -p *helix*
+/home/dan/.config/helix
+/home/dan/.config/helix/themes
+/home/dan/.config/helix/themes/zzd_rose_pine.toml
+/home/dan/.config/helix/runtime
+/home/dan/.config/helix/languages.toml
+/home/dan/.config/helix/config.toml
+```
+
 ## The Future
 
-  * option to match against entire path instead of just the name
-    of the final path element
   * filter by file type
   * optimization, probably (I've tried to do things in a
     not-obviously-stupid fashion, but otherwise there's none.)

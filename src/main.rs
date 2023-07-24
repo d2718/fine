@@ -37,8 +37,12 @@ fn print_absolute(path: &Path) -> Option<()> {
 /// set of patterns.
 fn check_match(opts: &Opts, ent: &DirEntry) -> Option<bool> {
     let path = ent.path();
-    let fname = path.file_name()?;
-    let bytes = <[u8]>::from_os_str(fname)?;
+    let path_to_match = if opts.full {
+        path.as_os_str()
+    } else {
+        path.file_name()?
+    };
+    let bytes = <[u8]>::from_os_str(path_to_match)?;
 
     Some(opts.patterns.is_match(bytes))
 }
@@ -47,12 +51,13 @@ fn check_match(opts: &Opts, ent: &DirEntry) -> Option<bool> {
 /// for and printing paths with matching filenames.
 fn walk_and_check(opts: &Opts) -> Result<(), Box<dyn Error>> {
     for res in WalkDir::new(&opts.base).follow_links(false) {
-        let ent = match res {
-            Ok(ent) => ent,
-            Err(e) => {
+        let ent = match (res, opts.errors) {
+            (Ok(ent), _) => ent,
+            (Err(e), true) => {
                 eprintln!("{}", &e);
                 continue;
-            }
+            },
+            (Err(_), false) => continue,
         };
 
         match (
