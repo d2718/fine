@@ -10,27 +10,37 @@ use regex::bytes::RegexSet;
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct OptArgs {
+    /// Base directory in which to search.
+    #[arg(short = 'd', long = "dir",
+        default_value_t = String::from("."))]
+    base: String,
     /// The pattern(s) to match file paths against.
     pattern: Vec<String>,
     /// Use regex (instead of glob) matching.
     #[arg(short, long, default_value_t = false)]
     regex: bool,
-    /// Base directory in which to search.
+    /// Print absolute paths [default: relative to BASE]
     #[arg(short, long)]
-    base: Option<PathBuf>,
+    absolute: bool,
 }
 
+/// Options derived from [`OptArgs`] to be usable to the rest of
+/// the program.
 #[derive(Default)]
 pub struct Opts {
+    /// Set of filename patterns against which to match.
     pub patterns: RegexSet,
+    /// Base directory from which to start searching.
     pub base: PathBuf,
+    /// Whether to display aboslute (or relative) path names.
+    pub absolute: bool,
 }
 
 impl Opts {
     pub fn new() -> Result<Opts, String> {
         let oa = OptArgs::parse();
         if oa.pattern.is_empty() {
-            return Err("you must specify at least one pattern".into())
+            return Err("you must specify at least one pattern".into());
         }
 
         let mut opts = Opts::default();
@@ -38,7 +48,8 @@ impl Opts {
         let oa_strs: Vec<String> = if oa.regex {
             oa.pattern
         } else {
-            oa.pattern.iter()
+            oa.pattern
+                .iter()
                 .map(|pat| Glob::new(pat))
                 .collect::<Result<Vec<_>, _>>()
                 .map_err(|e| format!("{}", &e))?
@@ -47,12 +58,11 @@ impl Opts {
                 .collect()
         };
 
-        let patterns = RegexSet::new(&oa_strs).map_err(|e| format!(
-            "{}", &e
-        ))?;
+        let patterns = RegexSet::new(&oa_strs).map_err(|e| format!("{}", &e))?;
 
         opts.patterns = patterns;
-        opts.base = oa.base.unwrap_or_else(|| PathBuf::from("."));
+        opts.base = PathBuf::from(oa.base);
+        opts.absolute = oa.absolute;
 
         Ok(opts)
     }
