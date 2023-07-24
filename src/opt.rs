@@ -27,7 +27,7 @@ pub struct Opts {
 }
 
 impl Opts {
-    fn new() -> Result<Opts, String> {
+    pub fn new() -> Result<Opts, String> {
         let oa = OptArgs::parse();
         let mut opts = Opts::default();
 
@@ -48,7 +48,7 @@ impl Opts {
         ))?;
 
         opts.patterns = patterns;
-        opts.base = oa.base.unwrap_or_else(|| PathBuf::from("/"));
+        opts.base = oa.base.unwrap_or_else(|| PathBuf::from("."));
 
         Ok(opts)
     }

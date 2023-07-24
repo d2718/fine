@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-regex = "^1.9"
+bstr = "^1.6"
 clap = { version = "^4.3", features = ["derive"] }
 globset = { version = "^0.4", default-features = false }
+regex = "^1.9"
+walkdir = "^2.3"
