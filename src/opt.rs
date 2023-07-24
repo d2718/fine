@@ -29,6 +29,10 @@ pub struct Opts {
 impl Opts {
     pub fn new() -> Result<Opts, String> {
         let oa = OptArgs::parse();
+        if oa.pattern.is_empty() {
+            return Err("you must specify at least one pattern".into())
+        }
+
         let mut opts = Opts::default();
 
         let oa_strs: Vec<String> = if oa.regex {

@@ -50,7 +50,14 @@ fn do_the_thing(opts: Opts) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn wrapped_main() -> Result<(), Box<dyn Error>> {
+    let opts = Opts::new()?;
+    do_the_thing(opts)
+}
+
 fn main() {
-    let opts = Opts::new().unwrap();
-    do_the_thing(opts).unwrap();
+    if let Err(e) = wrapped_main() {
+        eprintln!("{}", &e);
+        std::process::exit(1);
+    }
 }
