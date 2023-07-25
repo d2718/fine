@@ -1,4 +1,5 @@
 mod opt;
+pub mod types;
 
 use std::{
     error::Error,

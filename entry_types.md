@@ -27,6 +27,13 @@ The file type is one of the following characters:
 `?` some other file type
 
 ```rust
+std::fs::Filetype
+    fn is_dir(&self) -> bool;
+    fn is_file(&self) -> bool;
+    fn is_symlink(&self) -> bool;
+```
+
+```rust
 std::os::unix::fs::FileTypeExt
     fn is_block_device(&self) -> bool;
     fn is_char_device(&self) -> bool;

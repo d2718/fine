@@ -3,9 +3,11 @@ Argument parsing and configutation.
 */
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{Parser, ArgAction};
 use globset::Glob;
 use regex::bytes::RegexSet;
+
+use crate::types::*;
 
 /// A more forgiving version of find; it works just fine.
 #[derive(Debug, Parser)]
@@ -15,17 +17,26 @@ struct OptArgs {
     #[arg(short = 'd', long = "dir",
         default_value_t = String::from("."))]
     base: String,
+
     /// The pattern(s) to match file paths against.
     pattern: Vec<String>,
+
     /// Use regex (instead of glob) matching.
     #[arg(short, long, default_value_t = false)]
     regex: bool,
-    /// Print absolute paths. [default: relative to BASE]
-    #[arg(short, long)]
-    absolute: bool,
+
     /// Match any part of the path, not just the filename.
     #[arg(short, long)]
     full: bool,
+
+    /// Match only against specified types [default is all].
+    #[arg(short, long = "type", action = ArgAction::Append)]
+    types: Vec<String>,
+
+    /// Print absolute paths. [default: relative to BASE]
+    #[arg(short, long)]
+    absolute: bool,
+
     /// Show access errors (default is to ignore them).
     #[arg(short, long)]
     errors: bool,
@@ -47,6 +58,9 @@ pub struct Opts {
     /// Show errors (default is to ignore them because they are usually
     /// just permissions errors).
     pub errors: bool,
+    /// Directory entry types against which to match. Should default
+    /// to _all_ types if this is empty.
+    pub types: Vec<EType>
 }
 
 impl Opts {
