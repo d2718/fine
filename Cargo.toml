@@ -1,11 +1,19 @@
 [package]
 name = "fine"
-version = "0.3.1"
+version = "0.4.0"
+authors = ["Dan (d2718) <dx2718@gmail.com>"]
 edition = "2021"
+license = "MIT"
+description = """
+A more forgiving version of the `find` utility; it works just fine."""
+homepage = "https://github.com/d2718/fine"
+repository = "https://github.com/d2718/fine"
+readme = "README.md"
 
 [dependencies]
 bstr = "^1.6"
 clap = { version = "^4.3", features = ["derive"] }
+enum-iterator = "^1.4"
 globset = { version = "^0.4", default-features = false }
 regex = "^1.9"
 walkdir = "^2.3"

@@ -1,9 +1,12 @@
 /**!
 Argument parsing and configutation.
 */
-use std::path::PathBuf;
+use std::{
+    convert::TryFrom,
+    path::PathBuf,
+};
 
-use clap::{Parser, ArgAction};
+use clap::Parser;
 use globset::Glob;
 use regex::bytes::RegexSet;
 
@@ -30,7 +33,7 @@ struct OptArgs {
     full: bool,
 
     /// Match only against specified types [default is all].
-    #[arg(short, long = "type", action = ArgAction::Append)]
+    #[arg(short, long = "type", name = "TYPE")]
     types: Vec<String>,
 
     /// Print absolute paths. [default: relative to BASE]
@@ -86,12 +89,18 @@ impl Opts {
         };
 
         let patterns = RegexSet::new(&oa_strs).map_err(|e| format!("{}", &e))?;
+        let types = oa.types.iter()
+            .map(|s| {
+                let r = EType::try_from(s.as_str());
+                r
+            }).collect::<Result<Vec<_>, _>>()?;
 
         opts.patterns = patterns;
         opts.base = PathBuf::from(oa.base);
         opts.absolute = oa.absolute;
         opts.full = oa.full;
         opts.errors = oa.errors;
+        opts.types = types;
 
         Ok(opts)
     }

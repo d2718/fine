@@ -11,6 +11,7 @@ use bstr::ByteSlice;
 use walkdir::{DirEntry, WalkDir};
 
 use opt::Opts;
+use types::HasEType;
 
 static NEWLINE: &[u8] = b"\n";
 
@@ -59,6 +60,12 @@ fn walk_and_check(opts: &Opts) -> Result<(), Box<dyn Error>> {
             "\"{}\" is not a directory", &opts.base.display()
         ).into());
     }
+
+    let ok_types = if opts.types.is_empty() {
+        None
+    } else {
+        Some(opts.types.as_slice())
+    };
     
     for res in WalkDir::new(&opts.base).follow_links(false) {
         let ent = match (res, opts.errors) {
@@ -69,6 +76,12 @@ fn walk_and_check(opts: &Opts) -> Result<(), Box<dyn Error>> {
             },
             (Err(_), false) => continue,
         };
+
+        if let Some(types) = ok_types {
+            if !ent.file_type().is_one(types) {
+                continue;
+            }
+        }
 
         match (
             check_match(opts, &ent).unwrap_or_default(),

@@ -9,13 +9,14 @@ Arguments:
   [PATTERN]...  The pattern(s) to match file paths against
 
 Options:
-  -d, --dir <BASE>  Base directory in which to search [default: .]
-  -r, --regex       Use regex (instead of glob) matching
-  -a, --absolute    Print absolute paths. [default: relative to BASE]
-  -f, --full        Match any part of the path, not just the filename
-  -e, --errors      Show access errors (default is to ignore them)
-  -h, --help        Print help
-  -V, --version     Print version
+  -d, --dir <BASE>   Base directory in which to search [default: .]
+  -r, --regex        Use regex (instead of glob) matching
+  -f, --full         Match any part of the path, not just the filename
+  -t, --type <TYPE>  Match only against specified types [default is all]
+  -a, --absolute     Print absolute paths. [default: relative to BASE]
+  -e, --errors       Show access errors (default is to ignore them)
+  -h, --help         Print help
+  -V, --version      Print version
 ```
 
 ## Installation
@@ -43,7 +44,7 @@ dan@lauDANum:~/dev/fine$ fine *.rs Cargo.*
 ./Cargo.lock
 ```
 
-Specify a different directory with `-d`:
+Specify a specific base directory with `-d`:
 
 ```text
 dan@lauDANum:~/dev/fine$ fine -d /usr/share/fonts terminus*
@@ -76,10 +77,51 @@ target/debug/.fingerprint/clap_lex-a87e359c0a25297d
 target/debug/.fingerprint/clap_builder-8a1806fd13db2c47
 ```
 
+Match only against certain types of directory entries with `-t`:
+
+```text
+dan@lauDANum:~/dev/fine$ target/debug/fine -d /dev -t link '*'
+/dev/stderr
+/dev/stdout
+/dev/stdin
+/dev/fd
+```
+
+You can use `-t` more than once to specify multiple types:
+
+```text
+dan@lauDANum:~/dev/fine$ target/debug/fine -d /dev -t dir -t link '*'
+/dev
+/dev/shm
+/dev/pts
+/dev/stderr
+/dev/stdout
+/dev/stdin
+/dev/fd
+/dev/block
+/dev/bsg
+/dev/mapper
+/dev/bus
+/dev/bus/usb
+/dev/bus/usb/002
+/dev/bus/usb/001
+/dev/vfio
+/dev/net
+/dev/dri
+```
+
+Specify an invalid type to get a list of types supported on your platform:
+
+```text
+dan@lauDANum:~/dev/fine$ target/debug/fine -t fnord *.*
+directory entry type fnord invalid or not supported on this platform
+possible values are: file, dir, link, fifo, socket, block, char
+```
+
 Match your pattern agains the entire path (instead of just the final
 element) with `-p`:
 
-```rust
+```text
 dan@lauDANum:~/dev/fine$ fine -d ~/.config *helix*
 /home/dan/.config/helix
 dan@lauDANum:~/dev/fine$ fine -d ~/.config -p *helix*
@@ -93,7 +135,7 @@ dan@lauDANum:~/dev/fine$ fine -d ~/.config -p *helix*
 
 ## The Future
 
-  * filter by file type
+  * controlling whether symbolic links should be followed
   * optimization, probably (I've tried to do things in a
     not-obviously-stupid fashion, but otherwise there's none.)
   * more organized error handling
